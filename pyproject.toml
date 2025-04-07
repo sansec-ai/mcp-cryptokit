@@ -13,6 +13,7 @@ dependencies = [
     "gmalg>=1.0.6",
     "mcp[cli]>=1.6.0",
     "dashscope>=1.23.0",
+    "openai==0.28.1",
 ]
 
 [tool.hatch.build.targets.wheel]

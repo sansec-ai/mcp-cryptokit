@@ -5,7 +5,7 @@ from contextlib import AsyncExitStack
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
-import dashscope
+import dashscope, openai
 from dashscope import Generation
 from dashscope.api_entities.dashscope_response import (GenerationResponse,DashScopeAPIResponse)
 from dotenv import load_dotenv
@@ -18,8 +18,55 @@ class MCPClient:
         # Initialize session and client objects
         self.session: Optional[ClientSession] = None
         self.exit_stack = AsyncExitStack()
-        dashscope.api_key = os.getenv('DASHSCOPE_API_KEY')
+        if os.getenv('OPENAI_API_KEY'):
+            openai.api_key = os.getenv('OPENAI_API_KEY')
+            openai.base_url = os.getenv('OPENAI_API_BASE', "https://api.openai.com/v1/")
+            self.api_mode = 'openai'
+        else:
+            dashscope.api_key = os.getenv('DASHSCOPE_API_KEY')
+            self.api_mode = 'dashscope'
+    async def _call_llm_api(self, messages, tools):
+        """统一的大模型调用接口"""
+        if self.api_mode == 'dashscope':
+            return Generation.call(
+                model='qwen-plus',
+                messages=messages,
+                tools=tools,
+                result_format='message'
+            )
+        elif self.api_mode == 'openai':
+            # 转换工具格式为OpenAI兼容格式
+            openai_tools = [{
+                "type": "function",
+                "function": {
+                    "name": tool['function']['name'],
+                    "description": tool['function']['description'],
+                    "parameters": tool['function']['parameters']
+                }
+            } for tool in tools]
+            
+            return await openai.ChatCompletion.acreate(
+                model=os.getenv('LLM_MODEL', 'qwq-32b'),
+                messages=messages,
+                tools=openai_tools,
+                tool_choice="auto"
+            )
 
+    def _normalize_response(self, response):
+        """统一不同API的响应格式"""
+        if self.api_mode == 'dashscope':
+            return {
+                'content': response.output.choices[0].message.get('content', ''),
+                'tool_calls': response.output.choices[0].message.get('tool_calls', []),
+                'role': response.output.choices[0].message.get('role', 'assistant')
+            }
+        elif self.api_mode == 'openai':
+            msg = response.choices[0].message
+            return {
+                'content': msg.content,
+                'tool_calls': msg.tool_calls,
+                'role': msg.role
+            }
     async def connect_to_server(self, server_script_path: str):
         """Connect to an MCP server
         
@@ -80,27 +127,24 @@ class MCPClient:
                     request_id=test_resp["request_id"],
                     status_code=HTTPStatus.OK,
                     output=test_resp["output"])
-                    response = GenerationResponse.from_api_response(api_resp)
+                    raw_response = GenerationResponse.from_api_response(api_resp)
+                    response = self._normalize_response(raw_response)
                     test_resp = None
                 else:
-                    response = Generation.call(
-                        model='qwen-plus',
-                        messages=messages,
-                        tools=available_tools if available_tools else None,
-                        result_format='message'  # Important for tool handling
-                    )
+                    raw_response = await self._call_llm_api(messages, available_tools)
+                    response = self._normalize_response(raw_response)
                     #print(f"response={response}")
 
                 # Validate API response
-                if not response or not response.output:
+                if not response:
                     raise ValueError(f"Empty API response :{response}")
-                    
-                if not response.output.choices:
-                    return "No response generated :{response}"
 
-                choice = response.output.choices[0]
-                message_content = choice.message.get('content', '')
-                tool_calls = choice.message.get('tool_calls', [])
+                message_content = response['content']
+                tool_calls = response['tool_calls']
+                role = response['role']
+                    
+                if not message_content and not tool_calls:
+                    return "No response generated :{response}"
                 
                 # 无工具调用时处理
                 if not tool_calls:
@@ -109,36 +153,37 @@ class MCPClient:
                     return "未识别响应格式"
                 
                 # 检查如果message如果有role且content非控，则print content ，并附加到messages
-                if choice.message.role and choice.message.content :
-                    print(f"{choice.message.role}: {choice.message.content}")
+                if role :
+                    print(f"{role}: {message_content}")
                     # messages.append({
                     #     "role": choice.message.role,
                     #     "content": self._convert_to_bailian_format(choice.message.content)
                     # })
                 # 记录assistant消息
                 assistant_msg = {
-                    "role": "assistant",
-                    "content": choice.message.content
+                    "role": role,
+                    "content": message_content
                 }
                 
                 assistant_msg["tool_calls"] = [
                         {
-                            "id": tc["id"],
+                            "id": tc.id if self.api_mode == 'openai' else tc["id"],
                             "function": {
-                                "name": tc["function"]["name"],
-                                "arguments": tc["function"]["arguments"]
+                                "name": tc.function.name if self.api_mode == 'openai' else tc["function"]["name"],
+                                "arguments": tc.function.arguments if self.api_mode == 'openai' else tc["function"]["arguments"]
                             },
                             "type": "function"
-                        } for tc in choice.message.tool_calls
+                        } for tc in tool_calls
                 ]
                 
                 messages.append(assistant_msg)            
                 # Handle tool calls
-                for tool_call in choice.message.tool_calls:
+                for tool_call in tool_calls:
                     try:
                         tool_name = tool_call["function"]["name"]
                         tool_args = self._parse_arguments(tool_call["function"]["arguments"])
-                        
+
+                        print(f"执行工具调用：{tool_name}，参数：{tool_args}")                        
                         # 执行工具调用
                         result = await self.session.call_tool(tool_name, tool_args)
                         if result.isError:

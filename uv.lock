@@ -482,6 +482,7 @@ dependencies = [
     { name = "gmssl" },
     { name = "httpx" },
     { name = "mcp", extra = ["cli"] },
+    { name = "openai" },
     { name = "pydantic" },
 ]
 
@@ -494,6 +495,7 @@ requires-dist = [
     { name = "gmssl", specifier = ">=2.5.4" },
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "mcp", extras = ["cli"], specifier = ">=1.6.0" },
+    { name = "openai", specifier = "==0.28.1" },
     { name = "pydantic", specifier = ">=2.0.0" },
 ]
 
@@ -573,6 +575,20 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/d2/86/cc42cfa9b85b7d174948a17f828ebcacb0247e727fbedf06506ba93387ef/multidict-6.3.2-cp313-cp313t-win32.whl", hash = "sha256:420e5144a5f598dad8db3128f1695cd42a38a0026c2991091dab91697832f8cc", size = 41908 },
     { url = "https://files.pythonhosted.org/packages/2a/36/5c015523a7650fb5c55380d1c779b938379bd091968ee822d719e4264ab7/multidict-6.3.2-cp313-cp313t-win_amd64.whl", hash = "sha256:875faded2861c7af2682c67088e6313fec35ede811e071c96d36b081873cea14", size = 45635 },
     { url = "https://files.pythonhosted.org/packages/aa/c1/7832c95a50641148b567b5366dd3354489950dcfd01c8fc28472bec63b9a/multidict-6.3.2-py3-none-any.whl", hash = "sha256:71409d4579f716217f23be2f5e7afca5ca926aaeb398aa11b72d793bff637a1f", size = 10347 },
+]
+
+[[package]]
+name = "openai"
+version = "0.28.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "aiohttp" },
+    { name = "requests" },
+    { name = "tqdm" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/49/fe/c21d95cc120928b0f5b44d8c522e48df122be3f1f9d61dfb7bf3d597c95d/openai-0.28.1.tar.gz", hash = "sha256:4be1dad329a65b4ce1a660fe6d5431b438f429b5855c883435f0f7fcb6d2dcc8", size = 61939 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1e/9f/385c25502f437686e4aa715969e5eaf5c2cb5e5ffa7c5cdd52f3c6ae967a/openai-0.28.1-py3-none-any.whl", hash = "sha256:d18690f9e3d31eedb66b57b88c2165d760b24ea0a01f150dd3f068155088ce68", size = 76950 },
 ]
 
 [[package]]
@@ -842,6 +858,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/04/1b/52b27f2e13ceedc79a908e29eac426a63465a1a01248e5f24aa36a62aeb3/starlette-0.46.1.tar.gz", hash = "sha256:3c88d58ee4bd1bb807c0d1acb381838afc7752f9ddaec81bbe4383611d833230", size = 2580102 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a0/4b/528ccf7a982216885a1ff4908e886b8fb5f19862d1962f56a3fce2435a70/starlette-0.46.1-py3-none-any.whl", hash = "sha256:77c74ed9d2720138b25875133f3a2dae6d854af2ec37dceb56aef370c1d8a227", size = 71995 },
+]
+
+[[package]]
+name = "tqdm"
+version = "4.67.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "colorama", marker = "sys_platform == 'win32'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/a8/4b/29b4ef32e036bb34e4ab51796dd745cdba7ed47ad142a9f4a1eb8e0c744d/tqdm-4.67.1.tar.gz", hash = "sha256:f8aef9c52c08c13a65f30ea34f4e5aac3fd1a34959879d7e59e63027286627f2", size = 169737 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d0/30/dc54f88dd4a2b5dc8a0279bdd7270e735851848b762aeb1c1184ed1f6b14/tqdm-4.67.1-py3-none-any.whl", hash = "sha256:26445eca388f82e72884e0d580d5464cd801a3ea01e63e5601bdff9ba6a48de2", size = 78540 },
 ]
 
 [[package]]
