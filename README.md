@@ -27,6 +27,8 @@ mcp-cryptokit 是一个基于MCP协议的密码套件，旨在为AI应用提供�
 ```bash
 git clone https://github.com/sansec-ai/mcp-cryptokit.git
 cd mcp-cryptokit
+uv venv
+source .venv/bin/activate
 # 启动测试
 uv run server.py
 
@@ -36,8 +38,9 @@ uv run server.py
 ```bash
 #将当前项目路径加入PYTHONPATH
 cd mcp-cryptokit
+source .venv/bin/activate
 export PYTHONPATH="${PYTHONPATH}:`(pwd)`"
-python test/mcp-client.py server.py
+python test/mcp_client.py server.py
 # 配置阿里百炼大模型平台的api key
 export MCP_API_KEY="DASHSCOPE_API_KEY"
 
