@@ -34,7 +34,7 @@ source .venv/bin/activate
 uv pip install .
 ```
 ### 使用示例
-可以在任何支持mcp协议的客户端使用本编码套件。
+可以在任何支持mcp协议的客户端使用本密码套件。
 #### mcp 配置
 以roo code编程为例，其配置步骤如下：
 - 在vscode中安装roo code插件(>=v3.11)，并配置大模型提供商，可参考[Roo-Code](https://github.com/RooVetGit/Roo-Code/blob/main/locales/zh-CN/README.md):。

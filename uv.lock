@@ -266,6 +266,7 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "asyncio" },
+    { name = "cffi" },
     { name = "cryptography" },
     { name = "gmalg" },
     { name = "gmssl" },
@@ -277,6 +278,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "asyncio", specifier = ">=3.0.0" },
+    { name = "cffi", specifier = ">=1.16.0" },
     { name = "cryptography", specifier = ">=41.0.2" },
     { name = "gmalg", specifier = ">=1.0.6" },
     { name = "gmssl", specifier = ">=2.5.4" },
