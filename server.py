@@ -335,19 +335,12 @@ def signature_workflow_prompt(data: str) -> list[Message]:
 4. 验证时调用 sm2_verify"""
         }
     ]
-def parse_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--key_store", 
-        type=str, 
-        default=os.getcwd() + "/keystore.json",
-        help="密钥存储目录 (默认: 当前工作目录)"
-    )
-    return parser.parse_args()
 
 if __name__ == "__main__":
     # Initialize key manager and crypto utils
-    args = parse_args()
-    key_mgr = kms_utils.init_key_system(args.key_store)
+    key_store_path = os.getenv("CRYPTOKIT_KEY_STORE_PATH", os.path.join(os.getcwd(), "keystore.json"))
+
+    key_mgr = kms_utils.init_key_system(key_store_path)
     crypto_util = crypto_utils.CryptoUtils(key_mgr)
 
     # Initialize and run the server

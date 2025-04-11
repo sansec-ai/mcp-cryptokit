@@ -32,7 +32,7 @@ class TestSymmetricCrypto(unittest.TestCase):
         self.assertEqual(plaintext, decrypted_text)
 
     def test_aes_encrypt_decrypt(self):
-        self.aes_key_id = self.key_mgr.generate_key('AES', length=256)
+        self.aes_key_id = self.key_mgr.generate_key('AES', 256)
         # Test data
         plaintext = "Hello, AES!"
         
@@ -48,7 +48,7 @@ class TestSymmetricCrypto(unittest.TestCase):
         self.assertEqual(plaintext, decrypted_text)
 
     def test_rsa_encrypt_decrypt(self):
-        self.rsa_key_id = self.key_mgr.generate_key('RSA', key_size=2048)
+        self.rsa_key_id = self.key_mgr.generate_key('RSA', 2048)
         # Test data
         plaintext = "Hello, RSA!"
         
@@ -64,7 +64,7 @@ class TestSymmetricCrypto(unittest.TestCase):
         self.assertEqual(plaintext, decrypted_text)
 
     def test_rsa_sign_verify(self):
-        self.rsa_key_id = self.key_mgr.generate_key('RSA', key_size=2048)
+        self.rsa_key_id = self.key_mgr.generate_key('RSA', 2048)
         # Test data
         plaintext = "Hello, RSA Sign/Verify!"
         

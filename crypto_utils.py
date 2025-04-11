@@ -130,7 +130,7 @@ class CryptoUtils:
         # Generate proper random K
         k = func.random_hex(sm2_crypt.para_len) 
         # SM3-with-SM2 is the standard combination
-        signature = sm2_crypt.sign_with_sm3(data.encode())
+        signature = sm2_crypt.sign_with_sm3(data.encode(), k)
         return base64.b64encode(bytes.fromhex(signature)).decode()
 
     def sm2_verify(self, data: str, signature: str, key_id: int) -> bool:

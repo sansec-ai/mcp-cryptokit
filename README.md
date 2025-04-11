@@ -25,87 +25,25 @@ mcp-cryptokit 是一个基于MCP协议的密码套件，旨在为AI应用提供�
 ### 安装
 
 ```bash
-git clone https://github.com/sansec-ai/mcp-cryptokit.git
+# 下载项目到本地目录, 如：/work/mcp-cryptokit
+git clone https://github.com/sansec-ai/mcp-cryptokit.git  /work/mcp-cryptokit
 cd mcp-cryptokit
 uv venv
 source .venv/bin/activate
-# 启动测试
-uv run server.py
-
+# 安装依赖
+uv pip install .
 ```
 ### 使用示例
-#### 使用本项目提供的mcp_client.py测试
-```bash
-#将当前项目路径加入PYTHONPATH
-cd mcp-cryptokit
-source .venv/bin/activate
-export PYTHONPATH="${PYTHONPATH}:`(pwd)`"
-python test/mcp_client.py server.py
-# 配置阿里百炼大模型平台的api key
-export MCP_API_KEY="DASHSCOPE_API_KEY"
+可以在任何支持mcp协议的客户端使用本编码套件。
+#### mcp 配置
+以roo code编程为例，其配置步骤如下：
+- 在vscode中安装roo code插件(>=v3.11)，并配置大模型提供商，可参考[Roo-Code](https://github.com/RooVetGit/Roo-Code/blob/main/locales/zh-CN/README.md):。
+- 在roo code的MCP服务器配置文件中增加配置如下：
 
-```
-连接成功将输出如下信息：
-```bash
-$ python test/mcp-client.py server.py
-
-Connected to server with tools: ['generate_key', 'sm2_encrypt', 'sm2_decrypt', 'sm2_sign', 'sm2_verify', 'sm4_encrypt', 'sm4_decrypt', 'aes_encrypt', 'aes_decrypt', 'rsa_encrypt', 'rsa_decrypt', 'hash_data']
-
-MCP Client Started!
-Type your queries or 'quit' to exit.
-
-Query:
-
-```
-测试样例：
-```bash
-Query: 使用sm4算法加密数据：我是明文
-assistant: 为了使用SM4算法加密您的数据，我们需要遵循以下步骤：
-
-1. 查询现有的SM4密钥ID列表。如果没有可用的密钥ID，则生成一个新的SM4密钥。
-2. 使用获得的密钥ID来加密提供的明文数据。
-
-首先，我将查询现有的SM4密钥ID列表。
-assistant: 查询结果显示有多个SM4密钥ID可用。我们将使用第一个查询到的密钥ID，即1，来进行加密操作。
-
-接下来，我将使用密钥ID为1的SM4密钥来加密您的数据"我是明文"。
-
-使用SM4算法和密钥ID为1的密钥加密后的数据为：
-
-\[ JlZf5+d6Xc1WbGTmlah2ZQbhaiaYwhEvVOI5uEW6/4zE1BipOvCcO8FaR/8a6Bkl \]
-
-这是加密后的密文，采用base64编码。如果您需要解密此数据或有其他需求，请随时告知。
-
-# 使用aes算法，由于没有密钥，mcp会自动创建一个
-Query: 使用aes算法加密数据：我是明文
-assistant: 为了使用AES算法加密您的数据，我们需要遵循以下步骤：
-
-1. 查询现有的AES密钥ID。如果没有可用的AES密钥，我们将生成一个新的AES密钥。
-2. 使用找到或生成的AES密钥ID来加密提供的明文数据。
-
-现在，我将开始执行第一个步骤，即查询现有的AES密钥ID。
-assistant: 看来目前没有可用的AES密钥，因此我将生成一个新的AES密钥以进行加密操作。接下来，我将调用`generate_key`函数来创建一个新的AES密钥。
-assistant: 已成功生成新的AES密钥，其ID为22。现在我将使用这个新生成的AES密钥来加密您的数据"我是明文"。接下来，我会调用`aes_encrypt`函数进行加密。
-
-您的数据"我是明文"已经使用AES加密，生成的密文（以Base64编码）为:
-\[ tlj2MgrsqQyCJLOl08OIgHjVPBzNyWq2pnYsFtUNAUo= \]
-
-如果您需要解密此数据或有其他任何操作，请随时告知我。
-
-```
-
-#### 使用编程插件测试
-
-以roo code为例，拉取项目到`/work`目录:
-```bash
-git clone https://github.com/sansec-ai/mcp-cryptokit.git /work/mcp-cryptokit
-```
-
-在mcp server配置文件中增加：
 ```json
 {
   "mcpServers": {
-    "CryptoKit": {
+    "mcp-cryptokit": {
       "command": "uv",
       "args": [
         "--directory",
@@ -113,13 +51,38 @@ git clone https://github.com/sansec-ai/mcp-cryptokit.git /work/mcp-cryptokit
         "run",
         "server.py"
       ],
+      "timeout": 30,
       "alwaysAllow": [],
-      "disabled": false
+      "disabled": false,
+      "env": {
+        "CRYPTOKIT_KEY_STORE_PATH": "/data/keystore.json"
+      }
     }
   }
 }
-```
 
+```
+配置成功，可在Roo Code的`MCP 服务器`查看到`mcp-cryptokit`服务。
+
+![mcp-cryptokit服务](doc/roocode.png)
+
+#### 使用
+在`Roo Code`中配置`mcp-cryptokit`服务成功，可在对话框输入以下请求：
+```bash
+使用sm4密钥加密数据：我是明文
+```
+`Roo Code`会自动调用`mcp-cryptokit`服务，创建sm4密钥，并使用sm4密钥加密明文。示例如下：
+##### 1.第一步，尝试查询sm4类型密钥
+![](doc/chat1.png)
+##### 2.第二步，如果密钥不存在，则创建sm4密钥，并返回密钥ID。
+![](doc/chat2.png)
+##### 3.第三步，使用密钥ID和明文，调用sm4加密服务，并返回密文。
+![](doc/chat3.png)
+
+也可以直接使用指定密钥加密数据，请求如下：
+```bash
+使用1号sm4密钥加密数据：我是明文
+```
 
 ## 贡献指南
 欢迎贡献代码或提出改进建议！请参考贡献指南了解如何参与项目。
