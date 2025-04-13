@@ -1,6 +1,6 @@
 [project]
 name = "mcp-cryptokit"
-version = "0.1.0"
+version = "0.1.2"
 description = "A MCP server project to handle cryptographic operations."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -16,11 +16,11 @@ dependencies = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/cryptokit"]
+packages = ["."]
 
 [build-system]
 requires = [ "hatchling",]
 build-backend = "hatchling.build"
 
 [project.scripts]
-mcp-cryptokit = "cryptokit:main"
+mcp-cryptokit = "server:main"

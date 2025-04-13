@@ -335,8 +335,7 @@ def signature_workflow_prompt(data: str) -> list[Message]:
 4. 验证时调用 sm2_verify"""
         }
     ]
-
-if __name__ == "__main__":
+def main():    
     # Initialize key manager and crypto utils
     key_store_path = os.getenv("CRYPTOKIT_KEY_STORE_PATH", os.path.join(os.getcwd(), "keystore.json"))
 
@@ -346,3 +345,7 @@ if __name__ == "__main__":
     # Initialize and run the server
     # asyncio.run(stdio_main())
     server.run(transport='stdio')
+    #server.run(transport='sse')
+
+if __name__ == "__main__":
+    main()
