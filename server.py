@@ -339,6 +339,7 @@ def main():
     # Initialize key manager and crypto utils
     key_store_path = os.getenv("CRYPTOKIT_KEY_STORE_PATH", os.path.join(os.getcwd(), "keystore.json"))
 
+    global key_mgr, crypto_util
     key_mgr = kms_utils.init_key_system(key_store_path)
     crypto_util = crypto_utils.CryptoUtils(key_mgr)
 
